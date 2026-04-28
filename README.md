@@ -7,7 +7,21 @@
 
 A web-based oscilloscope simulator with a physically-inspired multi-pass phosphor rendering pipeline. Simulates the characteristic glow, persistence, and bloom of vintage CRT oscilloscope displays.
 
-**Zero install. Just Docker.**
+<p align="center">
+  <a href="https://hubertlim.github.io/oscilloscope_playground/">
+    <img src="assets/hero-preview.svg" alt="Phosphor Oscilloscope Simulator" width="700"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://hubertlim.github.io/oscilloscope_playground/"><strong>🟢 Try the Live Demo</strong></a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#quick-start">Docker Setup</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://github.com/hubertlim/oscilloscope_playground/issues/new?template=bug_report.md">Report Bug</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://github.com/hubertlim/oscilloscope_playground/issues/new?template=feature_request.md">Request Feature</a>
+</p>
 
 ## Quick Start
 
@@ -18,10 +32,6 @@ docker compose up --build
 Open **http://localhost:8090** in your browser. That's it.
 
 > **Requirements:** Docker and Docker Compose. Nothing else is installed on your machine.
-
-## Screenshots
-
-*Press **Tab** to collapse the controls panel. Press **F** or double-click the scope for fullscreen.*
 
 ## Features
 

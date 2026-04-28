@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="bloom">
+      <feGaussianBlur stdDeviation="8" result="bloom"/>
+      <feComposite in="SourceGraphic" in2="bloom" operator="over"/>
+    </filter>
+    <filter id="bigbloom">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <radialGradient id="screen-grad" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#060a08"/>
+      <stop offset="100%" stop-color="#020403"/>
+    </radialGradient>
+    <radialGradient id="desk" cx="50%" cy="60%" r="60%">
+      <stop offset="0%" stop-color="#141210"/>
+      <stop offset="100%" stop-color="#080706"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Desk surface -->
+  <rect width="800" height="500" fill="url(#desk)"/>
+
+  <!-- Bezel -->
+  <rect x="100" y="30" width="600" height="440" rx="16" fill="#2a2a2e" stroke="#3a3a3e" stroke-width="2"/>
+
+  <!-- Screen -->
+  <rect x="120" y="50" width="560" height="380" rx="8" fill="url(#screen-grad)"/>
+
+  <!-- Grid lines (subtle) -->
+  <g opacity="0.08" stroke="#33ff66" stroke-width="0.5">
+    <line x1="176" y1="50" x2="176" y2="430"/>
+    <line x1="232" y1="50" x2="232" y2="430"/>
+    <line x1="288" y1="50" x2="288" y2="430"/>
+    <line x1="344" y1="50" x2="344" y2="430"/>
+    <line x1="400" y1="50" x2="400" y2="430"/>
+    <line x1="456" y1="50" x2="456" y2="430"/>
+    <line x1="512" y1="50" x2="512" y2="430"/>
+    <line x1="568" y1="50" x2="568" y2="430"/>
+    <line x1="624" y1="50" x2="624" y2="430"/>
+    <line x1="120" y1="88" x2="680" y2="88"/>
+    <line x1="120" y1="126" x2="680" y2="126"/>
+    <line x1="120" y1="164" x2="680" y2="164"/>
+    <line x1="120" y1="202" x2="680" y2="202"/>
+    <line x1="120" y1="240" x2="680" y2="240"/>
+    <line x1="120" y1="278" x2="680" y2="278"/>
+    <line x1="120" y1="316" x2="680" y2="316"/>
+    <line x1="120" y1="354" x2="680" y2="354"/>
+    <line x1="120" y1="392" x2="680" y2="392"/>
+  </g>
+  <!-- Center cross -->
+  <g opacity="0.15" stroke="#33ff66" stroke-width="0.8">
+    <line x1="400" y1="50" x2="400" y2="430"/>
+    <line x1="120" y1="240" x2="680" y2="240"/>
+  </g>
+
+  <!-- Lissajous bloom layer (big soft glow) -->
+  <g filter="url(#bigbloom)" opacity="0.35">
+    <path d="M400,100 C480,100 540,160 540,240 C540,320 480,380 400,380 C320,380 260,320 260,240 C260,160 320,100 400,100 Z" fill="none" stroke="#33ff66" stroke-width="6"/>
+    <ellipse cx="400" cy="240" rx="120" ry="80" fill="none" stroke="#33ff66" stroke-width="4" transform="rotate(30,400,240)"/>
+    <ellipse cx="400" cy="240" rx="120" ry="80" fill="none" stroke="#33ff66" stroke-width="4" transform="rotate(-30,400,240)"/>
+  </g>
+
+  <!-- Lissajous main trace -->
+  <g filter="url(#glow)">
+    <path d="M400,100 C480,100 540,160 540,240 C540,320 480,380 400,380 C320,380 260,320 260,240 C260,160 320,100 400,100 Z" fill="none" stroke="#33ff66" stroke-width="2" opacity="0.9"/>
+    <ellipse cx="400" cy="240" rx="120" ry="80" fill="none" stroke="#33ff66" stroke-width="1.5" opacity="0.7" transform="rotate(30,400,240)"/>
+    <ellipse cx="400" cy="240" rx="120" ry="80" fill="none" stroke="#33ff66" stroke-width="1.5" opacity="0.7" transform="rotate(-30,400,240)"/>
+  </g>
+
+  <!-- Bright core at intersections -->
+  <g filter="url(#bloom)">
+    <circle cx="400" cy="160" r="4" fill="#aaffbb" opacity="0.8"/>
+    <circle cx="400" cy="320" r="4" fill="#aaffbb" opacity="0.8"/>
+    <circle cx="310" cy="200" r="3" fill="#aaffbb" opacity="0.6"/>
+    <circle cx="490" cy="200" r="3" fill="#aaffbb" opacity="0.6"/>
+    <circle cx="310" cy="280" r="3" fill="#aaffbb" opacity="0.6"/>
+    <circle cx="490" cy="280" r="3" fill="#aaffbb" opacity="0.6"/>
+  </g>
+
+  <!-- LED -->
+  <circle cx="140" cy="455" r="4" fill="#33ff66" opacity="0.9"/>
+  <circle cx="140" cy="455" r="8" fill="#33ff66" opacity="0.15"/>
+
+  <!-- Bezel text -->
+  <text x="160" y="458" font-family="Courier New, monospace" font-size="7" fill="#555" letter-spacing="2">POWER</text>
+  <text x="580" y="458" font-family="Courier New, monospace" font-size="7" fill="#444" letter-spacing="2">PHOSPHOR OS-200</text>
+
+  <!-- Mode indicator on screen -->
+  <text x="130" y="424" font-family="Courier New, monospace" font-size="8" fill="#33ff66" opacity="0.35" letter-spacing="1">LISSAJOUS</text>
+
+  <!-- Call to action overlay -->
+  <rect x="280" y="195" width="240" height="90" rx="8" fill="#000" opacity="0.7"/>
+  <text x="400" y="228" font-family="Courier New, monospace" font-size="14" fill="#33ff66" text-anchor="middle" letter-spacing="3" opacity="0.9">▶ LIVE DEMO</text>
+  <text x="400" y="252" font-family="Courier New, monospace" font-size="9" fill="#888" text-anchor="middle" letter-spacing="1">Click to try in your browser</text>
+  <text x="400" y="272" font-family="Courier New, monospace" font-size="8" fill="#555" text-anchor="middle" letter-spacing="1">No install required</text>
+</svg>

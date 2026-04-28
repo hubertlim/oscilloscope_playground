@@ -12,6 +12,7 @@ import { VectorCanvas, DrawParams } from './signals/VectorCanvas';
 import { SignalGenerator, SignalMode } from './signals/SignalGenerator';
 import { Controls } from './ui/Controls';
 import { DrawOverlay } from './ui/DrawOverlay';
+import fallbackPresets from './presets.json';
 
 class App {
   private renderer: PhosphorRenderer;
@@ -377,10 +378,12 @@ class App {
       if (res.ok) {
         const presets = await res.json();
         this.controls.renderPresets(presets);
+        return;
       }
     } catch {
-      console.log('Presets API not available');
+      // API not available — use embedded fallback presets
     }
+    this.controls.renderPresets(fallbackPresets);
   }
 
   private async savePreset(name: string): Promise<void> {
