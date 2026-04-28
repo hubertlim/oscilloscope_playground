@@ -1,0 +1,14 @@
+{
+  "name": "phosphor-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "11.7.0",
+    "cors": "2.8.5",
+    "express": "4.21.1"
+  }
+}

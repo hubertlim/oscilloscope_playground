@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phosphor — Oscilloscope Simulator</title>
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Desk surface background -->
+    <div id="desk-surface"></div>
+
+    <div id="scope-container">
+      <div id="scope-bezel">
+        <div id="scope-screen">
+          <canvas id="scope-canvas"></canvas>
+          <div id="scope-overlay">
+            <div class="grid-overlay"></div>
+          </div>
+          <div id="scope-info">
+            <span id="info-mode">LISSAJOUS</span>
+            <span id="info-fps"></span>
+          </div>
+        </div>
+        <div id="bezel-bottom">
+          <div id="scope-led">
+            <div class="led-light on"></div>
+            <span class="led-label">POWER</span>
+          </div>
+          <span class="bezel-brand">PHOSPHOR OS-200</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating action buttons -->
+    <button id="btn-toggle-panel" class="fab" title="Toggle controls (Tab)">☰</button>
+    <button id="btn-fullscreen" class="fab fab-fs" title="Fullscreen (F)">⛶</button>
+
+    <!-- Floating quick-controls (visible when panel is collapsed) -->
+    <div id="quick-controls" class="hidden">
+      <div class="qc-section">
+        <div class="qc-tabs">
+          <button class="qc-tab active" data-mode="lissajous">LIS</button>
+          <button class="qc-tab" data-mode="waveform">WAV</button>
+          <button class="qc-tab" data-mode="multi">MUL</button>
+          <button class="qc-tab" data-mode="audio">AUD</button>
+          <button class="qc-tab" data-mode="draw">DRW</button>
+        </div>
+      </div>
+      <div class="qc-divider"></div>
+      <div class="qc-section">
+        <div class="qc-colors">
+          <button class="qc-color active" data-color="green" style="background:#33ff66;"></button>
+          <button class="qc-color" data-color="amber" style="background:#ffb833;"></button>
+          <button class="qc-color" data-color="blue" style="background:#33aaff;"></button>
+          <button class="qc-color" data-color="white" style="background:#ccddff;"></button>
+        </div>
+      </div>
+      <div class="qc-divider"></div>
+      <div class="qc-section qc-sliders">
+        <label>BLOOM</label>
+        <input type="range" id="qc-bloom" min="0" max="1.5" step="0.01" value="0.6" />
+        <label>PERSIST</label>
+        <input type="range" id="qc-decay" min="0.5" max="0.99" step="0.01" value="0.92" />
+      </div>
+    </div>
+
+    <!-- Controls panel (collapsible) -->
+    <div id="controls-panel">
+      <div id="controls-header">
+        <h1>PHOSPHOR</h1>
+        <div id="mode-toggle">
+          <button id="btn-realistic" class="mode-btn" title="Realistic oscilloscope panel">REALISTIC</button>
+          <button id="btn-playground" class="mode-btn active" title="Playground controls">PLAYGROUND</button>
+        </div>
+      </div>
+
+      <div id="signal-tabs">
+        <button class="signal-tab active" data-mode="lissajous">LISSAJOUS</button>
+        <button class="signal-tab" data-mode="waveform">WAVEFORM</button>
+        <button class="signal-tab" data-mode="multi">MULTI</button>
+        <button class="signal-tab" data-mode="audio">AUDIO</button>
+        <button class="signal-tab" data-mode="draw">DRAW</button>
+      </div>
+
+      <div id="controls-body">
+        <div id="playground-controls" class="controls-mode">
+          <div id="sig-lissajous" class="signal-controls">
+            <section class="control-group">
+              <h3>Lissajous Signal</h3>
+              <div class="control-row"><label>Frequency X</label><input type="range" id="ctrl-freqX" min="1" max="12" step="0.1" value="3" /><span class="ctrl-value" data-for="ctrl-freqX">3.0</span></div>
+              <div class="control-row"><label>Frequency Y</label><input type="range" id="ctrl-freqY" min="1" max="12" step="0.1" value="2" /><span class="ctrl-value" data-for="ctrl-freqY">2.0</span></div>
+              <div class="control-row"><label>Phase</label><input type="range" id="ctrl-phase" min="0" max="6.283" step="0.01" value="0" /><span class="ctrl-value" data-for="ctrl-phase">0.00</span></div>
+              <div class="control-row"><label>Amplitude</label><input type="range" id="ctrl-amplitude" min="0.1" max="1.0" step="0.01" value="0.8" /><span class="ctrl-value" data-for="ctrl-amplitude">0.80</span></div>
+              <div class="control-row"><label>Speed</label><input type="range" id="ctrl-speed" min="0.1" max="5.0" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-speed">1.0</span></div>
+            </section>
+          </div>
+          <div id="sig-waveform" class="signal-controls hidden">
+            <section class="control-group"><h3>Display Mode</h3><div class="control-row"><label>Mode</label><div class="toggle-group"><button class="toggle-btn active" data-param="wf-displayMode" data-value="yt">Y-T</button><button class="toggle-btn" data-param="wf-displayMode" data-value="xy">X-Y</button></div></div></section>
+            <section class="control-group"><h3>Channel 1</h3><div class="control-row"><label>Shape</label><div class="shape-selector" data-param="wf-ch1Shape"><button class="shape-btn active" data-value="sine" title="Sine">∿</button><button class="shape-btn" data-value="square" title="Square">⊓</button><button class="shape-btn" data-value="sawtooth" title="Sawtooth">⩘</button><button class="shape-btn" data-value="triangle" title="Triangle">△</button><button class="shape-btn" data-value="noise" title="Noise">⚡</button></div></div><div class="control-row"><label>Frequency</label><input type="range" id="ctrl-wf-ch1Freq" min="0.5" max="10" step="0.1" value="2.0" /><span class="ctrl-value" data-for="ctrl-wf-ch1Freq">2.0</span></div><div class="control-row"><label>Amplitude</label><input type="range" id="ctrl-wf-ch1Amp" min="0.05" max="1.0" step="0.01" value="0.7" /><span class="ctrl-value" data-for="ctrl-wf-ch1Amp">0.70</span></div><div class="control-row"><label>Phase</label><input type="range" id="ctrl-wf-ch1Phase" min="0" max="6.283" step="0.01" value="0" /><span class="ctrl-value" data-for="ctrl-wf-ch1Phase">0.00</span></div></section>
+            <section id="wf-ch2-section" class="control-group hidden"><h3>Channel 2</h3><div class="control-row"><label>Shape</label><div class="shape-selector" data-param="wf-ch2Shape"><button class="shape-btn active" data-value="sine" title="Sine">∿</button><button class="shape-btn" data-value="square" title="Square">⊓</button><button class="shape-btn" data-value="sawtooth" title="Sawtooth">⩘</button><button class="shape-btn" data-value="triangle" title="Triangle">△</button><button class="shape-btn" data-value="noise" title="Noise">⚡</button></div></div><div class="control-row"><label>Frequency</label><input type="range" id="ctrl-wf-ch2Freq" min="0.5" max="10" step="0.1" value="3.0" /><span class="ctrl-value" data-for="ctrl-wf-ch2Freq">3.0</span></div><div class="control-row"><label>Amplitude</label><input type="range" id="ctrl-wf-ch2Amp" min="0.05" max="1.0" step="0.01" value="0.7" /><span class="ctrl-value" data-for="ctrl-wf-ch2Amp">0.70</span></div><div class="control-row"><label>Phase</label><input type="range" id="ctrl-wf-ch2Phase" min="0" max="6.283" step="0.01" value="0" /><span class="ctrl-value" data-for="ctrl-wf-ch2Phase">0.00</span></div></section>
+            <section class="control-group"><h3>Timebase</h3><div class="control-row"><label>Time/Div</label><input type="range" id="ctrl-wf-timebase" min="0.5" max="8" step="0.1" value="2.0" /><span class="ctrl-value" data-for="ctrl-wf-timebase">2.0</span></div><div class="control-row"><label>Speed</label><input type="range" id="ctrl-wf-speed" min="0.1" max="5.0" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-wf-speed">1.0</span></div></section>
+          </div>
+          <div id="sig-multi" class="signal-controls hidden">
+            <section class="control-group"><h3>Synthesis Mode</h3><div class="control-row"><label>Mode</label><div class="toggle-group"><button class="toggle-btn active" data-param="multi-mode" data-value="harmonics">HARM</button><button class="toggle-btn" data-param="multi-mode" data-value="additive">ADD</button><button class="toggle-btn" data-param="multi-mode" data-value="am">AM</button><button class="toggle-btn" data-param="multi-mode" data-value="fm">FM</button></div></div></section>
+            <section class="control-group"><h3>Base Signal</h3><div class="control-row"><label>Shape</label><div class="shape-selector" data-param="multi-baseShape"><button class="shape-btn active" data-value="sine" title="Sine">∿</button><button class="shape-btn" data-value="square" title="Square">⊓</button><button class="shape-btn" data-value="sawtooth" title="Sawtooth">⩘</button><button class="shape-btn" data-value="triangle" title="Triangle">△</button></div></div><div class="control-row"><label>Frequency</label><input type="range" id="ctrl-multi-baseFreq" min="0.5" max="8" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-multi-baseFreq">1.0</span></div><div class="control-row"><label>Amplitude</label><input type="range" id="ctrl-multi-baseAmp" min="0.1" max="1.0" step="0.01" value="0.7" /><span class="ctrl-value" data-for="ctrl-multi-baseAmp">0.70</span></div></section>
+            <section class="control-group"><h3>Modulator</h3><div class="control-row"><label>Shape</label><div class="shape-selector" data-param="multi-modShape"><button class="shape-btn active" data-value="sine" title="Sine">∿</button><button class="shape-btn" data-value="square" title="Square">⊓</button><button class="shape-btn" data-value="sawtooth" title="Sawtooth">⩘</button><button class="shape-btn" data-value="triangle" title="Triangle">△</button></div></div><div class="control-row"><label>Frequency</label><input type="range" id="ctrl-multi-modFreq" min="0.5" max="12" step="0.1" value="3.0" /><span class="ctrl-value" data-for="ctrl-multi-modFreq">3.0</span></div><div class="control-row"><label>Depth</label><input type="range" id="ctrl-multi-modAmp" min="0.0" max="1.0" step="0.01" value="0.5" /><span class="ctrl-value" data-for="ctrl-multi-modAmp">0.50</span></div></section>
+            <section id="multi-harmonics-section" class="control-group"><h3>Harmonics</h3><div class="control-row"><label>Count</label><input type="range" id="ctrl-multi-harmonicCount" min="1" max="16" step="1" value="5" /><span class="ctrl-value" data-for="ctrl-multi-harmonicCount">5</span></div><div class="control-row"><label>Falloff</label><input type="range" id="ctrl-multi-harmonicFalloff" min="0.2" max="3.0" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-multi-harmonicFalloff">1.0</span></div></section>
+            <section class="control-group"><div class="control-row"><label>Speed</label><input type="range" id="ctrl-multi-speed" min="0.1" max="5.0" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-multi-speed">1.0</span></div></section>
+          </div>
+          <div id="sig-audio" class="signal-controls hidden">
+            <section class="control-group"><h3>Audio Source</h3><div class="audio-source-buttons"><button id="btn-audio-mic" class="audio-src-btn" title="Use microphone"><span class="audio-icon">🎤</span><span>Microphone</span></button><button id="btn-audio-file" class="audio-src-btn" title="Load audio file"><span class="audio-icon">📁</span><span>Audio File</span></button><button id="btn-audio-stop" class="audio-src-btn stop-btn hidden" title="Stop audio"><span class="audio-icon">⏹</span><span>Stop</span></button></div><input type="file" id="audio-file-input" accept="audio/*" class="hidden" /><div id="audio-drop-zone" class="audio-drop-zone"><span>Drop audio file here</span></div><div id="audio-status" class="audio-status">No audio source</div></section>
+            <section class="control-group"><h3>Display</h3><div class="control-row"><label>Mode</label><div class="toggle-group"><button class="toggle-btn active" data-param="audio-displayMode" data-value="waveform">WAVE</button><button class="toggle-btn" data-param="audio-displayMode" data-value="spectrum">SPEC</button><button class="toggle-btn" data-param="audio-displayMode" data-value="xy">X-Y</button><button class="toggle-btn" data-param="audio-displayMode" data-value="radial">RAD</button></div></div></section>
+            <section class="control-group"><h3>Analysis</h3><div class="control-row"><label>Gain</label><input type="range" id="ctrl-audio-gain" min="0.5" max="10.0" step="0.1" value="3.0" /><span class="ctrl-value" data-for="ctrl-audio-gain">3.0</span></div><div class="control-row"><label>Smoothing</label><input type="range" id="ctrl-audio-smoothing" min="0.0" max="0.95" step="0.01" value="0.70" /><span class="ctrl-value" data-for="ctrl-audio-smoothing">0.70</span></div><div class="control-row"><label>FFT Size</label><div class="toggle-group"><button class="toggle-btn" data-param="audio-fftSize" data-value="512">512</button><button class="toggle-btn" data-param="audio-fftSize" data-value="1024">1K</button><button class="toggle-btn active" data-param="audio-fftSize" data-value="2048">2K</button><button class="toggle-btn" data-param="audio-fftSize" data-value="4096">4K</button></div></div></section>
+          </div>
+          <div id="sig-draw" class="signal-controls hidden">
+            <section class="control-group"><h3>Drawing Tools</h3><div class="draw-toolbar"><button id="btn-draw-pen" class="draw-tool-btn active" title="Freehand draw">✏️ Draw</button><button id="btn-draw-undo" class="draw-tool-btn" title="Undo last path">↩ Undo</button><button id="btn-draw-clear" class="draw-tool-btn danger" title="Clear all">✕ Clear</button></div><div id="draw-path-count" class="draw-info">0 paths</div></section>
+            <section class="control-group"><h3>Templates</h3><div class="template-grid"><button class="template-btn" data-template="circle" title="Circle">◯</button><button class="template-btn" data-template="star" title="Star">☆</button><button class="template-btn" data-template="square" title="Square">□</button><button class="template-btn" data-template="triangle" title="Triangle">△</button><button class="template-btn" data-template="pentagon" title="Pentagon">⬠</button><button class="template-btn" data-template="heart" title="Heart">♡</button><button class="template-btn" data-template="spiral" title="Spiral">🌀</button><button class="template-btn" data-template="infinity" title="Infinity">∞</button><button class="template-btn" data-template="grid" title="Grid">⊞</button><button class="template-btn" data-template="crosshair" title="Crosshair">⊕</button></div></section>
+            <section class="control-group"><h3>Trace</h3><div class="control-row"><label>Speed</label><input type="range" id="ctrl-draw-traceSpeed" min="0.1" max="5.0" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-draw-traceSpeed">1.0</span></div><div class="control-row"><label>Interpolation</label><div class="toggle-group"><button class="toggle-btn active" data-param="draw-interpolation" data-value="linear">LINEAR</button><button class="toggle-btn" data-param="draw-interpolation" data-value="smooth">SMOOTH</button></div></div></section>
+            <section class="control-group"><h3>Animation</h3><div class="timeline-controls"><button id="btn-anim-play" class="draw-tool-btn" title="Play/Pause">▶ Play</button><button id="btn-anim-addkf" class="draw-tool-btn" title="Add keyframe">+ Key</button><button id="btn-anim-clearkf" class="draw-tool-btn danger" title="Clear keyframes">✕ Keys</button></div><div class="control-row"><label>Anim Speed</label><input type="range" id="ctrl-draw-animSpeed" min="0.1" max="5.0" step="0.1" value="1.0" /><span class="ctrl-value" data-for="ctrl-draw-animSpeed">1.0</span></div><div class="control-row"><label>Loop</label><div class="toggle-group"><button class="toggle-btn active" data-param="draw-loop" data-value="true">ON</button><button class="toggle-btn" data-param="draw-loop" data-value="false">OFF</button></div></div><div id="keyframe-list" class="keyframe-list"></div><div id="timeline-bar" class="timeline-bar"><div id="timeline-progress" class="timeline-progress"></div><div id="timeline-markers"></div></div></section>
+          </div>
+
+          <!-- Phosphor controls (shared) -->
+          <section class="control-group"><h3>Phosphor</h3>
+            <div class="control-row"><label>Color</label><div class="color-presets"><button class="color-btn active" data-color="green" style="background:#33ff66;" title="P1 Green"></button><button class="color-btn" data-color="amber" style="background:#ffb833;" title="Amber"></button><button class="color-btn" data-color="blue" style="background:#33aaff;" title="P11 Blue"></button><button class="color-btn" data-color="white" style="background:#ccddff;" title="P4 White"></button></div></div>
+            <div class="control-row"><label>Persistence</label><input type="range" id="ctrl-decay" min="0.5" max="0.99" step="0.01" value="0.92" /><span class="ctrl-value" data-for="ctrl-decay">0.92</span></div>
+            <div class="control-row"><label>Bloom</label><input type="range" id="ctrl-bloom" min="0" max="1.5" step="0.01" value="0.6" /><span class="ctrl-value" data-for="ctrl-bloom">0.60</span></div>
+            <div class="control-row"><label>Bloom Radius</label><input type="range" id="ctrl-bloomRadius" min="1" max="8" step="0.5" value="3" /><span class="ctrl-value" data-for="ctrl-bloomRadius">3.0</span></div>
+            <div class="control-row"><label>Beam Width</label><input type="range" id="ctrl-beamWidth" min="0.5" max="5.0" step="0.1" value="2.0" /><span class="ctrl-value" data-for="ctrl-beamWidth">2.0</span></div>
+          </section>
+          <section class="control-group"><h3>Display</h3>
+            <div class="control-row"><label>CRT Curvature</label><input type="range" id="ctrl-curvature" min="0" max="0.15" step="0.005" value="0.04" /><span class="ctrl-value" data-for="ctrl-curvature">0.04</span></div>
+            <div class="control-row"><label>Vignette</label><input type="range" id="ctrl-vignette" min="0" max="1.0" step="0.01" value="0.3" /><span class="ctrl-value" data-for="ctrl-vignette">0.30</span></div>
+            <div class="control-row"><label>Grid</label><input type="range" id="ctrl-grid" min="0" max="0.5" step="0.01" value="0.15" /><span class="ctrl-value" data-for="ctrl-grid">0.15</span></div>
+            <div class="control-row"><label>Scanlines</label><input type="range" id="ctrl-scanlines" min="0" max="0.5" step="0.01" value="0.08" /><span class="ctrl-value" data-for="ctrl-scanlines">0.08</span></div>
+          </section>
+          <section class="control-group"><h3>Presets</h3><div id="presets-list" class="presets-list"></div><div class="control-row"><button id="btn-save-preset" class="action-btn">Save Current</button></div></section>
+        </div>
+
+        <!-- Realistic mode -->
+        <div id="realistic-controls" class="controls-mode hidden">
+          <div class="scope-panel">
+            <div class="panel-section bnc-section"><div class="bnc-row"><div class="bnc-connector"><div class="bnc-ring"></div><div class="bnc-center"></div><span class="bnc-label">CH1</span></div><div class="bnc-connector"><div class="bnc-ring"></div><div class="bnc-center"></div><span class="bnc-label">CH2</span></div><div class="bnc-connector"><div class="bnc-ring"></div><div class="bnc-center"></div><span class="bnc-label">EXT</span></div></div></div>
+            <div class="panel-section"><div class="panel-label">HORIZONTAL</div><div class="knob-row"><div class="knob-container"><div class="knob" id="knob-freqX" data-param="freqX" data-min="1" data-max="12"><div class="knob-indicator"></div></div><span class="knob-label">FREQ X</span></div><div class="knob-container"><div class="knob" id="knob-phase" data-param="phase" data-min="0" data-max="6.283"><div class="knob-indicator"></div></div><span class="knob-label">PHASE</span></div></div></div>
+            <div class="panel-section"><div class="panel-label">VERTICAL</div><div class="knob-row"><div class="knob-container"><div class="knob" id="knob-freqY" data-param="freqY" data-min="1" data-max="12"><div class="knob-indicator"></div></div><span class="knob-label">FREQ Y</span></div><div class="knob-container"><div class="knob" id="knob-amplitude" data-param="amplitude" data-min="0.1" data-max="1.0"><div class="knob-indicator"></div></div><span class="knob-label">AMPL</span></div></div></div>
+            <div class="panel-section"><div class="panel-label">INTENSITY</div><div class="knob-row"><div class="knob-container"><div class="knob" id="knob-bloom" data-param="bloom" data-min="0" data-max="1.5"><div class="knob-indicator"></div></div><span class="knob-label">BLOOM</span></div><div class="knob-container"><div class="knob" id="knob-beamWidth" data-param="beamWidth" data-min="0.5" data-max="5.0"><div class="knob-indicator"></div></div><span class="knob-label">FOCUS</span></div></div></div>
+            <div class="panel-section"><div class="panel-label">TRACE</div><div class="knob-row"><div class="knob-container"><div class="knob" id="knob-decay" data-param="decay" data-min="0.5" data-max="0.99"><div class="knob-indicator"></div></div><span class="knob-label">PERSIST</span></div><div class="knob-container"><div class="knob" id="knob-speed" data-param="speed" data-min="0.1" data-max="5.0"><div class="knob-indicator"></div></div><span class="knob-label">SPEED</span></div></div></div>
+            <div class="panel-section"><div class="panel-label">PHOSPHOR</div><div class="rotary-switch-container"><div class="rotary-labels"><span class="rotary-label" data-pos="0" style="color:#33ff66;">P1</span><span class="rotary-label" data-pos="1" style="color:#ffb833;">AMB</span><span class="rotary-label" data-pos="2" style="color:#33aaff;">P11</span><span class="rotary-label" data-pos="3" style="color:#ccddff;">P4</span></div><div class="rotary-switch" id="rotary-phosphor-color"><div class="rotary-indicator"></div></div></div></div>
+            <div class="panel-section panel-brand"><div class="brand-plate"><span class="brand-name">PHOSPHOR</span><span class="brand-model">OS-200</span><span class="brand-sub">DUAL CHANNEL</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
