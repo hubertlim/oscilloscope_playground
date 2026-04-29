@@ -9,7 +9,7 @@ A web-based oscilloscope simulator with a physically-inspired multi-pass phospho
 
 <p align="center">
   <a href="https://hubertlim.github.io/oscilloscope_playground/">
-    <img src="assets/hero-preview.svg" alt="Phosphor Oscilloscope Simulator" width="700"/>
+    <img src="assets/demo.gif" alt="Phosphor Oscilloscope Simulator — Live Demo" width="700"/>
   </a>
 </p>
 
